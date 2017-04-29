@@ -95,6 +95,7 @@ def Fig2(theta2 = 0, seq_length = 100):
             ax.set_ylim([0.000001, 1])
             ax.set_xscale('log', basex=10)
             ax.set_yscale('log', basey=10)
+
             plt.axvline(x = 1000, c = 'grey', linestyle = '--', lw = 3)
             ax.legend(loc='upper left', prop={'size':12})
             ax.set_xlabel('Avg. time in seed bank (generations), '+ r'$log_{10}$' , fontsize=18)
@@ -107,7 +108,7 @@ def Fig2(theta2 = 0, seq_length = 100):
             colors = ['#87CEEB', '#FFA500', '#FF6347']
             x = np.arange(1,10001)
             for i, M in enumerate(Ms):
-                IN = pd.read_csv(mydir + 'data/Fig3b/merged/G10000_S100_N1000_M' + str(M) + '_c10_Pi.txt', \
+                IN = pd.read_csv(mydir + 'data/Fig2b/merged/G10000_S100_N1000_M' + str(M) + '_c10_Pi.txt', \
                     sep = ' ')
                 IN_mean = IN.mean(axis = 1).values / seq_length
                 IN_std = IN.std(axis = 1)
@@ -122,6 +123,12 @@ def Fig2(theta2 = 0, seq_length = 100):
     #fig.text(.05, 0.5, 'Expected nucleotide diversity (' + r'$\pi$' + ')' + r'$log_{10}$', \
     #    fontsize=18, rotation='vertical', \
     #horizontalalignment='center', verticalalignment='center')
+    fig.text(0.15, 0.95, 'a)',  fontsize=14,
+        horizontalalignment='center',
+        verticalalignment='center', fontweight='bold')
+    fig.text(0.15, 0.475, 'b)',  fontsize=14,
+        horizontalalignment='center',
+        verticalalignment='center', fontweight='bold')
     fig.tight_layout()
     fig.savefig(mydir + 'figures/Fig2.png', \
             bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
@@ -138,7 +145,7 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             for j, c in enumerate(Cs):
                 g = []
                 p = []
-                df = pd.read_csv(mydir + 'data/Fig4a/sweep_N_' + str(N) + '_M_1000_c_' + \
+                df = pd.read_csv(mydir + 'data/Fig3a/sweep_N_' + str(N) + '_M_1000_c_' + \
                     str(c) + '_s_' + str(s) + '.txt', header = None)
                 df = df.fillna(1.0)
                 for index, row in df.iterrows():
@@ -172,8 +179,8 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             ax = fig.add_subplot(2, 1, i+1)
             colors = ['#FF6347', '#FFA500', '#87CEEB']
             pop_type = {'N': 'Active', 'M': 'Dormant'}
-            IN_N = pd.read_csv(mydir + 'data/Fig4b/T_fix_N_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
-            IN_M = pd.read_csv(mydir + 'data/Fig4b/T_fix_M_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
+            IN_N = pd.read_csv(mydir + 'data/Fig3b/T_fix_N_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
+            IN_M = pd.read_csv(mydir + 'data/Fig3b/T_fix_M_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
             df_add = IN_N.add(IN_M, fill_value=0)
             df = df_add.divide(2, axis=0)
             Cs = df.columns.values.astype(float)
@@ -228,25 +235,16 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             ax.set_yscale('log', basey=10)
             ax.set_ylim([10, 100000])
 
+    fig.text(0.14, 0.955, 'a)',  fontsize=14,
+        horizontalalignment='center',
+        verticalalignment='center', fontweight='bold')
+    fig.text(0.14, 0.48, 'b)',  fontsize=14,
+        horizontalalignment='center',
+        verticalalignment='center', fontweight='bold')
     fig.tight_layout()
     fig.savefig(mydir + 'figures/Fig3.png', \
         bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
-
-def Fig5():
-    fig, ax = plt.subplots()
-    cs = [1, 6, 11, 17, 22, 27, 32, 37, 43, 48, 53, 58, 64, 69, 74, 79, 84]
-    M = 100
-    for c in cs:
-        path = mydir + 'data/Fig5/Fig5_x/G50_U0.001_R0.01_N100_M100_c' + str(int(c)) + '.txt'
-        IN = pd.read_csv(path, sep = ' ')
-        pan_mean = np.std(IN['pan_genome'].values)
-        core_genome = np.std(IN['core_genome'].values)
-        print c, pan_mean/core_genome
-        #sort = IN.sort('replicate', ascending=False)
-        #print sort
-        #r = np.log10(sort['replicate'].values)
-        #print r
 
 
 def Fig4(subpop = 'all'):
@@ -254,7 +252,7 @@ def Fig4(subpop = 'all'):
     for i in range(2):
         if i == 0:
             ax = fig.add_subplot(2, 1, i + 1)
-            IN = pd.read_excel(mydir + 'data/Fig6/evo12597-sup-0004-Table-S2.xlsx')
+            IN = pd.read_excel(mydir + 'data/Fig4/evo12597-sup-0004-Table-S2.xlsx')
             IN.columns = ['Taxon', 'NCBI', 'SporeGenes', 'dS', 'BranchLength', 'CodonBias', 'SporeForming']
             x = IN['SporeGenes'].values
             x = np.log10(x)
@@ -290,7 +288,7 @@ def Fig4(subpop = 'all'):
             distances_c_x = []
             for c in cs:
                 c = int(c)
-                IN_path = mydir + 'data/Fig6/Fig6_sim/Fig6_sim_c_' + str(c) +'.txt'
+                IN_path = mydir + 'data/Fig4/Fig4_sim/Fig4_sim_c_' + str(c) +'.txt'
                 IN = pd.read_csv(IN_path, sep = ' ', header = 'infer')
                 #data_dict[avg_time] = IN.evol_distance.values
                 if subpop == 'all':
@@ -332,19 +330,17 @@ def Fig4(subpop = 'all'):
         fig_name = mydir + 'figures/Fig4_N.png'
     elif subpop == 'M':
         fig_name = mydir + 'figures/Fig4_M.png'
+    fig.text(0.15, 0.97 , 'a)',  fontsize=14,
+        horizontalalignment='center',
+        verticalalignment='center', fontweight='bold')
+    fig.text(0.15, 0.475, 'b)',  fontsize=14,
+        horizontalalignment='center',
+        verticalalignment='center', fontweight='bold')
     fig.tight_layout()
     fig.savefig(fig_name, bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
 
 
 
+
 #Fig4()
-#dist_core_genome_fig()
-#Fig5zzzz()
-#Fig5zzzz()
-#Fig6()
-#Fig6(subpop = 'N')
-#Fig6(subpop = 'all')
-#Fig4()
-#Fig5()
-Fig2()

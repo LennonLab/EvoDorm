@@ -25,63 +25,6 @@ def gen_log_space(limit, n):
     return np.array(map(lambda x: round(x)-1, result), dtype=np.uint64)
 
 
-class run_simulation_hgt:
-
-    def __init__(self, N, M, u, G, g, reps = 100):
-        self.N = N
-        self.M = M
-        self.u = u
-        self.G = G
-        self.g = g
-        self.reps = reps
-
-    def run_HGT_dorm(self, c, R):
-        OUT = open(os.path.realpath(__file__).rsplit('/', 2)[0] + \
-        '/data/Fig5/G' + str(self.G) + '_U' + str(self.u) + '_R' + str(R) + \
-        '_N' + str(self.N) + '_M' + str(self.M) + '_c' + str(c) + '.txt', 'w+')
-        print>> OUT, 'replicate', 'pan_genome', 'core_genome'
-        for rep in range(self.reps):
-            print c, R, rep
-            simulation = sc.HGT_dorm(N = self.N, M = self.M, U = self.u, \
-                G = self.G, R = R, gens = self.g, c = c).get_gene_counts()
-            pan = simulation[0]
-            core = simulation[1]
-            print>> OUT, rep, pan, core
-        OUT.close()
-
-    def submit_mason_jobs(self):
-        cs = np.linspace(1, 100, num = 20, endpoint=True)
-        rs = np.logspace(-5, -1, num = 20, base = 10)
-        cs = np.rint(cs)
-        #cs = cs[15:]
-        rs = rs[0:1]
-        for c in cs:
-            for r in rs:
-                c = int(c)
-                OUT_folder_path = os.path.realpath(__file__).rsplit('/', 2)[0] + '/bash/mason_hgt_c/'
-                OUT_path = OUT_folder_path + 'mason_hgt_c' + str(c) + '_rec' +  str(r) + '.sh'
-                if os.path.exists(OUT_path) == True:
-                    os.remove(OUT_path)
-                OUT = open(OUT_path, 'w')
-                print>> OUT, '#!/bin/bash'
-                print>> OUT, '#PBS -k o'
-                print>> OUT, '#PBS -l nodes=1:ppn=8,vmem=100gb,walltime=30:00:00'
-                print>> OUT, '#PBS -M wrshoema@umail.iu.edu'
-                print>> OUT, '#PBS -m abe'
-                print>> OUT,  '#PBS -j oe'
-                print>> OUT,  ''
-                print>> OUT, 'module load python'
-                print>> OUT,  ''
-                print>> OUT,  'python ' + os.path.realpath(__file__) + ' -5 -s' + \
-                    ' -N ' + str(self.N) + ' -M ' + str(self.M) + ' -u ' + str(self.u) \
-                    + ' -G ' + str(self.G) + ' -g ' + str(self.g) + ' -R ' + str(r) \
-                    + ' -c ' + str(c) + ' -r ' + str(self.reps)
-
-                OUT.close()
-                #call('sh ' + OUT_path, shell=True)
-                call('qsub ' + OUT_path, shell=True)
-
-
 class run_simulation_evol_dist:
 
     def __init__(self, N, M, u, G, g, reps = 1000):
@@ -112,7 +55,7 @@ class run_simulation_evol_dist:
 
     def run_WF_dorm(self, c):
         OUT_data = open(os.path.realpath(__file__).rsplit('/', 2)[0] + \
-            '/data/Fig6/Fig6_sim/Fig6_sim_c_' + str(c)
+            '/data/Fig4/Fig4_sim/Fig4_sim_c_' + str(c)
             + '.txt', 'w')
         print>> OUT_data, 'active_size', 'dormant_size', 'mut_rate_per_base', \
             'genome_size', 'gens', 'dormancy_number', 'replicate', \
@@ -249,24 +192,6 @@ if __name__ == "__main__":
     elif args.Fig3 == True:
         #mf.Fig4()
         pass
-    elif args.Fig6 == True:
-        if args.run_mason == True:
-            run_simulation_Fig5(N = args.active_size, M = args.dormant_size, \
-                u = args.mut_rate_per_base, G = args.genome_size, \
-                g = args.generations, reps = args.replicates).submit_mason_jobs()
-        elif args.run_simulation == True:
-            run_simulation_Fig5(N = args.active_size, \
-                M = args.dormant_size, u = args.mut_rate_per_base, \
-                G = args.genome_size, g = args.generations, reps = args.replicates \
-                ).run_HGT_dorm(c = args.number_entering_dormancy, R = args.recomb_rate_per_base)
-        elif args.run_simulation_locally == True:
-            cs = np.linspace(1, args.dormant_size, num = 50, endpoint=True)
-            for c in cs:
-                c = int(c)
-                run_simulation_Fig5(N = args.active_size, \
-                    M = args.dormant_size, u = args.mut_rate_per_base, \
-                    G = args.genome_size, g = args.generations, reps = args.replicates \
-                    ).run_HGT_dorm(c = c, R = args.recomb_rate_per_base)
 
     elif args.Fig4 == True:
         if args.run_mason == True:
