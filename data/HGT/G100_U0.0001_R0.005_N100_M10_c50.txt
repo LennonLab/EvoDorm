@@ -1,0 +1,2 @@
+replicate pan_genome core_genome
+0 6 43
