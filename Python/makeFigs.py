@@ -7,53 +7,11 @@ import numpy.polynomial.polynomial as poly
 import matplotlib.lines as mlines
 from scipy.stats import gaussian_kde
 from scipy import stats
+from FlowCytometryTools import FCPlate, ThresholdGate
 
 
-mydir = os.path.expanduser("~/GitHub/EvoDormReview/")
+mydir = os.path.realpath(__file__).rsplit('/', 2)[0]
 
-
-def dist_core_genome_clean():
-    OUT = open(mydir + 'data/G50_U0.001_N200.txt', 'w+')
-    print>> OUT, 'r', 'pan_genome_mean', 'core_genome_mean', 'pan_genome_std', \
-        'core_genome_std'
-    for r_file in os.listdir(mydir + 'data/r_range'):
-        if r_file.endswith(".txt"):
-            IN = pd.read_csv(mydir + 'data/r_range/' + r_file, sep = ' ')
-            pan = IN['pan_genome'].values
-            core = IN['core_genome'].values
-            total = pan + core
-            f_pan = pan / total
-            f_core = core / total
-            f_pan_mean = np.mean(f_pan)
-            f_core_mean = np.mean(f_core)
-            f_pan_std = np.std(f_pan)
-            f_core_std = np.std(f_core)
-            r = float(r_file.split('_')[2][1:])
-            print>> OUT, r, f_pan_mean, f_core_mean, f_pan_std, f_core_std
-    OUT.close()
-
-def dist_core_genome_fig():
-    IN = pd.read_csv(mydir + 'data/G50_U0.001_N200.txt', sep = ' ')
-    sort = IN.sort('r', ascending=False)
-    r = np.log10(sort['r'].values)
-    fig, ax = plt.subplots()
-    colors = ['#87CEEB',  '#FF6347']
-    plt.grid()
-    ax.plot(r, sort['pan_genome_mean'],  lw = 2, color = colors[0], label = 'Distributed genome')
-    ax.fill_between(r, sort['pan_genome_mean']+sort['pan_genome_std'], \
-        sort['pan_genome_mean']-sort['pan_genome_std'], facecolor=colors[0], \
-        alpha=0.5)
-    ax.plot(r, sort['core_genome_mean'],  lw = 2, color = colors[1], lettabel = 'Core genome')
-    ax.fill_between(r, sort['core_genome_mean']+sort['core_genome_std'], \
-        sort['core_genome_mean']-sort['core_genome_std'], facecolor=colors[1], \
-        alpha=0.5)
-    ax.set_xlabel('Recombination rate, ' + r'$log_{10}$', fontsize=20)
-    ax.set_ylabel( 'Frequency of genes', fontsize=20)
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, \
-           ncol=2, mode="expand", borderaxespad=0.)
-    fig.savefig(mydir + 'figures/test.png', \
-    bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
-    plt.close()
 
 def sci_notation(num, decimal_digits=1, precision=None, exponent=None):
     """
@@ -108,7 +66,7 @@ def Fig2(theta2 = 0, seq_length = 100):
             colors = ['#87CEEB', '#FFA500', '#FF6347']
             x = np.arange(1,10001)
             for i, M in enumerate(Ms):
-                IN = pd.read_csv(mydir + 'data/Fig2b/merged/G10000_S100_N1000_M' + str(M) + '_c10_Pi.txt', \
+                IN = pd.read_csv(mydir + '/data/Fig2b/merged/G10000_S100_N1000_M' + str(M) + '_c10_Pi.txt', \
                     sep = ' ')
                 IN_mean = IN.mean(axis = 1).values / seq_length
                 IN_std = IN.std(axis = 1)
@@ -130,7 +88,7 @@ def Fig2(theta2 = 0, seq_length = 100):
         horizontalalignment='center',
         verticalalignment='center', fontweight='bold')
     fig.tight_layout()
-    fig.savefig(mydir + 'figures/Fig2.png', \
+    fig.savefig(mydir + '/figures/Fig2.png', \
             bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
 
@@ -145,7 +103,7 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             for j, c in enumerate(Cs):
                 g = []
                 p = []
-                df = pd.read_csv(mydir + 'data/Fig3a/sweep_N_' + str(N) + '_M_1000_c_' + \
+                df = pd.read_csv(mydir + '/data/Fig3a/sweep_N_' + str(N) + '_M_1000_c_' + \
                     str(c) + '_s_' + str(s) + '.txt', header = None)
                 df = df.fillna(1.0)
                 for index, row in df.iterrows():
@@ -179,8 +137,8 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             ax = fig.add_subplot(2, 1, i+1)
             colors = ['#FF6347', '#FFA500', '#87CEEB']
             pop_type = {'N': 'Active', 'M': 'Dormant'}
-            IN_N = pd.read_csv(mydir + 'data/Fig3b/T_fix_N_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
-            IN_M = pd.read_csv(mydir + 'data/Fig3b/T_fix_M_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
+            IN_N = pd.read_csv(mydir + '/data/Fig3b/T_fix_N_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
+            IN_M = pd.read_csv(mydir + '/data/Fig3b/T_fix_M_sweep_N_1000_M_10000_s_0.1_r_100.txt', sep = ' ')
             df_add = IN_N.add(IN_M, fill_value=0)
             df = df_add.divide(2, axis=0)
             Cs = df.columns.values.astype(float)
@@ -215,16 +173,16 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             std_M = np.asarray(std_M)
 
             ax.plot(timeInSb, means,  lw = 2, label='Active and dormant', \
-                color = colors[0])
-            ax.fill_between(timeInSb, means+std, means-std, facecolor=colors[0], alpha=0.5)
+                color = colors[1])
+            ax.fill_between(timeInSb, means+std, means-std, facecolor=colors[1], alpha=0.5)
 
             ax.plot(timeInSb_N, means_N,  lw = 2, label='Active', \
-                color = colors[1])
-            ax.fill_between(timeInSb_N, means_N+std_N, means_N-std_N, facecolor=colors[1], alpha=0.5)
+                color = colors[2])
+            ax.fill_between(timeInSb_N, means_N+std_N, means_N-std_N, facecolor=colors[2], alpha=0.5)
 
             ax.plot(timeInSb_M, means_M,  lw = 2, label='Dormant', \
-                color = colors[2])
-            ax.fill_between(timeInSb_M, means_M+std_M, means_M-std_M, facecolor=colors[2], alpha=0.5)
+                color = colors[0])
+            ax.fill_between(timeInSb_M, means_M+std_M, means_M-std_M, facecolor=colors[0], alpha=0.5)
 
             ax.set_xlabel('Average time in seed bank, ' + r'$log_{10}$', fontsize=20)
             ax.legend(loc='upper left', fontsize = 12)
@@ -242,7 +200,7 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
         horizontalalignment='center',
         verticalalignment='center', fontweight='bold')
     fig.tight_layout()
-    fig.savefig(mydir + 'figures/Fig3.png', \
+    fig.savefig(mydir + '/figures/Fig3.png', \
         bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
 
@@ -252,7 +210,7 @@ def Fig4(subpop = 'all'):
     for i in range(2):
         if i == 0:
             ax = fig.add_subplot(2, 1, i + 1)
-            IN = pd.read_excel(mydir + 'data/Fig4/evo12597-sup-0004-Table-S2.xlsx')
+            IN = pd.read_excel(mydir + '/data/Fig4/evo12597-sup-0004-Table-S2.xlsx')
             IN.columns = ['Taxon', 'NCBI', 'SporeGenes', 'dS', 'BranchLength', 'CodonBias', 'SporeForming']
             x = IN['SporeGenes'].values
             x = np.log10(x)
@@ -288,7 +246,7 @@ def Fig4(subpop = 'all'):
             distances_c_x = []
             for c in cs:
                 c = int(c)
-                IN_path = mydir + 'data/Fig4/Fig4_sim/Fig4_sim_c_' + str(c) +'.txt'
+                IN_path = mydir + '/data/Fig4/Fig4_sim/Fig4_sim_c_' + str(c) +'.txt'
                 IN = pd.read_csv(IN_path, sep = ' ', header = 'infer')
                 #data_dict[avg_time] = IN.evol_distance.values
                 if subpop == 'all':
@@ -325,11 +283,11 @@ def Fig4(subpop = 'all'):
             ax.set_ylabel('Evolutionary distance \n (JC69-corrected distance)', fontsize=16)
 
     if subpop == 'all':
-        fig_name = mydir + 'figures/Fig4.png'
+        fig_name = mydir + '/figures/Fig4.png'
     elif subpop == 'N':
-        fig_name = mydir + 'figures/Fig4_N.png'
+        fig_name = mydir + '/figures/Fig4_N.png'
     elif subpop == 'M':
-        fig_name = mydir + 'figures/Fig4_M.png'
+        fig_name = mydir + '/figures/Fig4_M.png'
     fig.text(0.15, 0.97 , 'a)',  fontsize=14,
         horizontalalignment='center',
         verticalalignment='center', fontweight='bold')
@@ -342,5 +300,73 @@ def Fig4(subpop = 'all'):
 
 
 
+def getDAPIgate(plate):
+    As = ['A3', 'A4']
+    cutoffs = []
+    for A in As:
+        DAPI = plate[A].data[['Pacific Blue-A']].values
+        DAPI_gate = np.mean(DAPI) + (2*np.std(DAPI))
+        cutoffs.append(DAPI_gate)
+    cutoff = np.mean(cutoffs)
+    return cutoff
 
-#Fig4()
+def Box1Fig():
+    fig = plt.figure()
+
+    path_006 = mydir + '/data/Box1Fig/Sample_006/'
+    path_012 = mydir + '/data/Box1Fig/Sample_012/'
+    path_264 = mydir + '/data/Box1Fig/Sample_264/'
+    plate_006 = FCPlate.from_dir(ID='Demo Plate', path = path_006, parser='name')
+    plate_012 = FCPlate.from_dir(ID='Demo Plate', path = path_012, parser='name')
+    plate_264 = FCPlate.from_dir(ID='Demo Plate', path = path_264, parser='name')
+    plate_006 = plate_006.dropna()
+    plate_012 = plate_012.dropna()
+    plate_264 = plate_264.dropna()
+    plate_006 = plate_006.transform('hlog', channels=['FSC-A', 'SSC-A', \
+        'FSC PMT-A','PI (YG)-A', 'FITC-A', 'Pacific Blue-A', 'APC-A'])
+    plate_012 = plate_012.transform('hlog', channels=['FSC-A', 'SSC-A', \
+        'FSC PMT-A','PI (YG)-A', 'FITC-A', 'Pacific Blue-A', 'APC-A'])
+    plate_264 = plate_264.transform('hlog', channels=['FSC-A', 'SSC-A', \
+        'FSC PMT-A','PI (YG)-A', 'FITC-A', 'Pacific Blue-A', 'APC-A'])
+    threshold_006 = getDAPIgate(plate_006)
+    threshold_012 = getDAPIgate(plate_012)
+    threshold_264 = getDAPIgate(plate_264)
+    gate_006 = ThresholdGate(threshold_006, 'Pacific Blue-A', region='above')
+    gate_012 = ThresholdGate(threshold_012, 'Pacific Blue-A', region='above')
+    gate_264 = ThresholdGate(threshold_264, 'Pacific Blue-A', region='above')
+    gated_sample_006 = plate_006['A8'].gate(gate_006)
+    gated_sample_012 = plate_012['A8'].gate(gate_012)
+    gated_sample_264 = plate_264['A8'].gate(gate_264)
+    RSG_006 = gated_sample_006.data[['FITC-A']].values
+    RSG_012 = gated_sample_012.data[['FITC-A']].values
+    RSG_264 = gated_sample_264.data[['FITC-A']].values
+
+    #colors = ['#FF6347', '#FFA500', '#87CEEB']
+
+    plt.hist(RSG_006, 40, fc='#87CEEB', histtype='bar', alpha=0.5, normed=True)
+    plt.hist(RSG_012, 40, fc='#FFA500', histtype='bar', alpha=0.5, normed=True)
+    plt.hist(RSG_264, 40, fc='#FF6347', histtype='bar', alpha=0.5, normed=True)
+
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+    plt.title('The distribution of reductase \n acivity in a microbial population', \
+        fontsize = 20, weight = 'heavy')
+    plt.xlabel('Reductase-associated fluorescence', fontsize = 18)
+    plt.ylabel('Probability', fontsize = 18)
+    plt.arrow(2400, 0.00075, 3300, 0, width=0.00004, \
+        head_width=0.00012, head_length=450,  length_includes_head=True, \
+        shape='full', color = '#87CEEB')
+    plt.text(2800, 0.0008, 'Resucitation', color = '#87CEEB', fontsize = 18, weight = 'heavy')
+    plt.arrow(5250, 0.00064, -3300, 0, width=0.00004, \
+        head_width=0.00012, head_length=450,  length_includes_head=True, \
+        shape='full', color = '#FF6347')
+    plt.text(2975, 0.00055 , 'Dormancy', color = '#FF6347', fontsize = 18, weight = 'heavy')
+
+    plt.xlim(0, 8000)
+    plt.ylim(0, 0.001)
+    fig.tight_layout()
+    fig_name = mydir + '/figures/Box1Fig.png'
+    fig.savefig(fig_name, bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
+    plt.close()
+
+
+Box1Fig()
