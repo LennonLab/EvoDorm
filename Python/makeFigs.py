@@ -50,6 +50,7 @@ def Fig2(theta2 = 0, seq_length = 100):
                     y.append(pi)
                 theta1_SN = sci_notation(theta1)
                 ax.plot(M, np.asarray(y), 'k-', color = colors[i], label= r'$\theta = {{{}}}$'.format(theta1_SN), linewidth=3)
+                ax.axhline(y = theta1, color=colors[i], ls = '--', lw = 3)
             ax.set_ylim([0.000001, 1])
             ax.set_xscale('log', basex=10)
             ax.set_yscale('log', basey=10)
@@ -341,6 +342,7 @@ def Box1Fig():
     RSG_012 = gated_sample_012.data[['FITC-A']].values
     RSG_264 = gated_sample_264.data[['FITC-A']].values
 
+
     #colors = ['#FF6347', '#FFA500', '#87CEEB']
 
     plt.hist(RSG_006, 40, fc='#87CEEB', histtype='bar', alpha=0.5, normed=True)
@@ -352,21 +354,22 @@ def Box1Fig():
         fontsize = 20, weight = 'heavy')
     plt.xlabel('Reductase-associated fluorescence', fontsize = 18)
     plt.ylabel('Probability', fontsize = 18)
-    plt.arrow(2400, 0.00075, 3300, 0, width=0.00004, \
+    plt.arrow(2500, 0.00075, 3400, 0, width=0.00004, \
         head_width=0.00012, head_length=450,  length_includes_head=True, \
         shape='full', color = '#87CEEB')
-    plt.text(2800, 0.0008, 'Resucitation', color = '#87CEEB', fontsize = 18, weight = 'heavy')
-    plt.arrow(5250, 0.00064, -3300, 0, width=0.00004, \
+    plt.arrow(5350, 0.00064, -3400, 0, width=0.00004, \
         head_width=0.00012, head_length=450,  length_includes_head=True, \
         shape='full', color = '#FF6347')
-    plt.text(2975, 0.00055 , 'Dormancy', color = '#FF6347', fontsize = 18, weight = 'heavy')
 
     plt.xlim(0, 8000)
     plt.ylim(0, 0.001)
     fig.tight_layout()
+    plt.gca().invert_xaxis()
+    plt.text(4800, 0.00055 , 'Dormancy', color = '#FF6347', fontsize = 18, weight = 'heavy')
+    plt.text(5050, 0.0008, 'Resucitation', color = '#87CEEB', fontsize = 18, weight = 'heavy')
     fig_name = mydir + '/figures/Box1Fig.png'
     fig.savefig(fig_name, bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
 
 
-Box1Fig()
+Fig2()
