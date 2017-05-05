@@ -189,7 +189,7 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             ax.legend(loc='upper left', fontsize = 12)
             ax.set_ylabel( r'$T_{fix}$', fontsize=20)
             plt.axvline(x = N, c = 'grey', linestyle = '--', lw = 3)
-            plt.axhline(y = 117.5107, c = 'blue', linestyle = '--', lw = 3)
+            plt.axhline(y = 117.5107, c = 'grey', linestyle = '--', lw = 3)
             ax.set_xscale('log', basex=10)
             ax.set_yscale('log', basey=10)
             ax.set_ylim([10, 100000])
@@ -372,4 +372,4 @@ def Box1Fig():
     plt.close()
 
 
-Fig2()
+Fig3()
