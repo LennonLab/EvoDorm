@@ -31,7 +31,7 @@ def sci_notation(num, decimal_digits=1, precision=None, exponent=None):
     return r"{0:.{2}f}\cdot10^{{{1:d}}}".format(coeff, exponent, precision)
 
 
-def Fig2(theta2 = 0, seq_length = 100):
+def Fig3(theta2 = 0, seq_length = 100):
     fig = plt.figure()
     for i in range(2):
         ax = fig.add_subplot(2, 1, i+1)
@@ -89,11 +89,11 @@ def Fig2(theta2 = 0, seq_length = 100):
         horizontalalignment='center',
         verticalalignment='center', fontweight='bold')
     fig.tight_layout()
-    fig.savefig(mydir + '/figures/Fig2.png', \
+    fig.savefig(mydir + '/figures/Fig3.png', \
             bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
 
-def Fig3(N = 1000, M = 10000, s = 0.1):
+def Fig4(N = 1000, M = 10000, s = 0.1):
     fig = plt.figure()
     for i in range(2):
         if i == 0:
@@ -130,7 +130,7 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
             ax.set_ylim([0, 1])
             ax.legend(loc='upper left', fontsize = 12)
             ax.set_xscale('log', basex=10)
-            plt.axhline(y = 0.5, c = 'grey', linestyle = '--', lw = 3)
+            #plt.axhline(y = 0.5, c = 'grey', linestyle = '--', lw = 3)
             ax.set_xlabel('Time (generations), ' + r'$log_{10}$', fontsize=20)
             ax.set_ylabel('Frequency of favored allele', fontsize=14)
 
@@ -201,12 +201,12 @@ def Fig3(N = 1000, M = 10000, s = 0.1):
         horizontalalignment='center',
         verticalalignment='center', fontweight='bold')
     fig.tight_layout()
-    fig.savefig(mydir + '/figures/Fig3.png', \
+    fig.savefig(mydir + '/figures/Fig4.png', \
         bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
 
 
-def Fig4(subpop = 'all'):
+def Fig5(subpop = 'all'):
     fig = plt.figure()
     for i in range(2):
         if i == 0:
@@ -284,11 +284,11 @@ def Fig4(subpop = 'all'):
             ax.set_ylabel('Evolutionary distance \n (JC69-corrected distance)', fontsize=16)
 
     if subpop == 'all':
-        fig_name = mydir + '/figures/Fig4.png'
+        fig_name = mydir + '/figures/Fig5.png'
     elif subpop == 'N':
-        fig_name = mydir + '/figures/Fig4_N.png'
+        fig_name = mydir + '/figures/Fig5_N.png'
     elif subpop == 'M':
-        fig_name = mydir + '/figures/Fig4_M.png'
+        fig_name = mydir + '/figures/Fig5_M.png'
     fig.text(0.15, 0.97 , 'a)',  fontsize=14,
         horizontalalignment='center',
         verticalalignment='center', fontweight='bold')
@@ -301,7 +301,10 @@ def Fig4(subpop = 'all'):
 
 
 
+
+
 def getDAPIgate(plate):
+
     As = ['A3', 'A4']
     cutoffs = []
     for A in As:
@@ -311,7 +314,7 @@ def getDAPIgate(plate):
     cutoff = np.mean(cutoffs)
     return cutoff
 
-def Box1Fig():
+def Fig2():
     fig = plt.figure()
 
     path_006 = mydir + '/data/Box1Fig/Sample_006/'
@@ -341,8 +344,6 @@ def Box1Fig():
     RSG_006 = gated_sample_006.data[['FITC-A']].values
     RSG_012 = gated_sample_012.data[['FITC-A']].values
     RSG_264 = gated_sample_264.data[['FITC-A']].values
-
-
     #colors = ['#FF6347', '#FFA500', '#87CEEB']
 
     plt.hist(RSG_006, 40, fc='#87CEEB', histtype='bar', alpha=0.5, normed=True)
@@ -350,10 +351,10 @@ def Box1Fig():
     plt.hist(RSG_264, 40, fc='#FF6347', histtype='bar', alpha=0.5, normed=True)
 
     plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-    plt.title('The distribution of reductase \n acivity in a microbial population', \
-        fontsize = 20, weight = 'heavy')
-    plt.xlabel('Reductase-associated fluorescence', fontsize = 18)
-    plt.ylabel('Probability', fontsize = 18)
+    #plt.title('The distribution of reductase \n acivity in a microbial population', \
+    #    fontsize = 20, weight = 'heavy')
+    plt.xlabel('Metabolic activity', fontsize = 18)
+    plt.ylabel('Frequency', fontsize = 18)
     plt.arrow(2500, 0.00075, 3400, 0, width=0.00004, \
         head_width=0.00012, head_length=450,  length_includes_head=True, \
         shape='full', color = '#87CEEB')
@@ -365,11 +366,8 @@ def Box1Fig():
     plt.ylim(0, 0.001)
     fig.tight_layout()
     plt.gca().invert_xaxis()
-    plt.text(4800, 0.00055 , 'Dormancy', color = '#FF6347', fontsize = 18, weight = 'heavy')
+    plt.text(4800, 0.00055 , 'Initiation', color = '#FF6347', fontsize = 18, weight = 'heavy')
     plt.text(5050, 0.0008, 'Resucitation', color = '#87CEEB', fontsize = 18, weight = 'heavy')
-    fig_name = mydir + '/figures/Box1Fig.png'
+    fig_name = mydir + '/figures/Fig2.png'
     fig.savefig(fig_name, bbox_inches = "tight", pad_inches = 0.4, dpi = 600)
     plt.close()
-
-
-Fig3()
